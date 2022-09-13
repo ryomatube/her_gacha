@@ -37,7 +37,16 @@
       </v-col>
 
       <v-col
-        class="mb-5"
+        class="mb-1"
+        cols="12"
+        v-if="total"
+      >
+        <p class="headline font-weight-bold my-0">
+          合計：{{total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}}円
+        </p>
+      </v-col>
+
+      <v-col
         cols="12"
         v-for="(part, index) in data"
         :key="index"
@@ -87,15 +96,20 @@ export default {
   data: () => ({
     data: [],
     loading: false,
+    total: 0,
   }),
 
   methods: {
     getCalculate() {
       this.data = [];
+      this.total = 0;
       this.loading = true;
       axios
         .get("https://script.google.com/macros/s/AKfycbzywMeQFf8T1vVjJaGg7oQM8M9DJEQxMn9xXsWZSK4XQrL_lSpI5hMAuFFtukyLlaGJ/exec")
         .then((response) => {
+            response.data.forEach((item) => {
+              this.total = this.total + Number(item[1]);
+            });
             this.data = response.data;
             this.loading = false;
           }
